@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cotizador | Viajes Casal</title>
+<style>
+:root{
+  --teal:#1F4E4A;
+  --turq:#4FA8A0;
+  --coral:#E2794F;
+  --sand:#F4E9D8;
+  --ink:#173733;
+  --line:#dfe6e2;
+  --card:#ffffff;
+  --bg:#eef2ef;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+h1,h2,h3{font-family:Georgia,'Times New Roman',serif}
+
+/* ---------- Top bar ---------- */
+.topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:12px 18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.topbar .logo{font-weight:800;color:var(--teal);margin-right:auto;font-size:15px;letter-spacing:.3px}
+.topbar .logo span{color:var(--coral)}
+button{background:var(--teal);color:#fff;border:0;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px}
+button.secondary{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
+button.coral{background:var(--coral)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:hover:not(:disabled){filter:brightness(1.08)}
+
+/* ---------- Layout shell ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:24px 18px 60px}
+[hidden]{display:none !important}
+
+/* ---------- Form view ---------- */
+.formCard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}
+.formCard h2{margin:0 0 4px;font-size:17px;color:var(--teal)}
+.formCard .hint{font-size:12px;color:#6b8580;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid.g2{grid-template-columns:repeat(2,1fr)}
+.grid.g4{grid-template-columns:repeat(4,1fr)}
+label{display:block;font-size:11.5px;font-weight:700;color:var(--teal);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;font-family:inherit;color:var(--ink);background:#fbfdfc}
+textarea{resize:vertical;min-height:52px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--turq);outline-offset:1px}
+.field{margin-bottom:12px}
+.durationHint{font-size:12px;color:var(--turq);font-weight:700;margin-top:-4px;margin-bottom:10px;min-height:16px}
+
+.svcRow{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.svcChk{display:flex;align-items:center;gap:7px;background:var(--sand);padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:700;color:var(--teal)}
+.svcChk input{width:auto;accent-color:var(--teal)}
+
+.fixedBlock{border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:12px;background:#fbfdfc}
+.fixedBlock .fbTitle{font-size:12.5px;font-weight:800;color:var(--turq);text-transform:uppercase;margin-bottom:10px}
+
+.proposal{border:1.5px dashed var(--turq);border-radius:14px;padding:18px;margin-top:16px;position:relative;background:#f8fcfb}
+.proposal .pTitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.proposal .pTitle b{color:var(--teal);font-size:14px}
+.removeBtn{background:none;border:none;color:var(--coral);font-size:12px;font-weight:700;cursor:pointer;padding:4px 8px}
+.addRow{display:flex;justify-content:center;margin-top:18px}
+.addRow button{background:var(--sand);color:var(--teal);border:1.5px dashed var(--turq)}
+
+.generateRow{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+.warn{background:#fff4ee;border:1px solid var(--coral);color:#8b3f1a;padding:10px 14px;border-radius:10px;font-size:12.5px;margin-bottom:14px}
+
+.imgUploadRow{display:flex;align-items:center;gap:12px}
+.imgUploadRow .field{flex:1;margin-bottom:0}
+.imgPreview{width:56px;height:56px;border-radius:12px;background:var(--sand) center/cover;border:1px solid var(--line);flex-shrink:0}
+
+.payScheme{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px;background:#fbfdfc}
+.payRows{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.payRow{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+.payRow label{margin-bottom:4px}
+
+/* ---------- Preview / sheet ---------- */
+.previewToolbar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+.tabs button{background:#fff;color:var(--teal);border:1.5px solid var(--line);padding:7px 14px;border-radius:20px;font-size:12px}
+.tabs button.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+.sheet{width:100%;max-width:1000px;margin:0 auto 26px;background:#fff;box-shadow:0 4px 22px #0001;overflow:hidden;border-radius:6px}
+.hero{min-height:340px;position:relative;color:#fff;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(100deg,#1F4E4Ae6,#4FA8A0cc),var(--heroimg,linear-gradient(135deg,#1F4E4A,#4FA8A0)) center/cover;padding:30px 44px 26px}
+.heroTop{display:flex;align-items:center;justify-content:space-between}
+.brandmark{font-family:Georgia,serif;font-size:15px;letter-spacing:.4px;opacity:.95}
+.brandmark .wave{color:var(--sand)}
+.hero .greeting{font-size:14px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;opacity:.95;margin-bottom:10px}
+.hero h1{font:42px/1.08 Georgia,serif;margin:0 0 12px;max-width:640px}
+.hero .partnerMsg{font-size:15px;line-height:1.5;margin:0;opacity:.97;max-width:520px}
+.heroBottom{display:flex;justify-content:flex-end;margin-top:22px}
+.quotebox{background:#f7fbfaf2;color:var(--teal);border-radius:18px;padding:14px 22px;text-align:center;min-width:220px}
+.quotebox small{font-weight:800;letter-spacing:.5px;font-size:11px}
+.quotebox strong{display:block;font-size:20px;margin:4px 0}
+.quotebox span{font-size:11.5px}
+.quotebox .propTag{display:block;font-size:10.5px;color:var(--turq);font-weight:700;margin-top:4px}
+
+.content{padding:0 36px 30px}
+.card{border:1px solid var(--line);border-radius:18px;padding:22px;margin:14px 0;background:#fff}
+.cardtitle{font-size:16px;font-weight:800;color:var(--turq);margin-bottom:16px}
+.trip{margin-top:-40px;position:relative}
+.tripgrid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1.1fr;gap:16px}
+.lbl{font-size:11px;font-weight:800;color:var(--teal);text-transform:uppercase}
+.val{font-size:13.5px;margin-top:4px;line-height:1.4}
+.support{border-left:1px solid var(--line);padding-left:18px}
+.support b{color:var(--turq);font-size:11px}
+.wabtn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:#25D366;color:#fff;padding:7px 12px;border-radius:16px;font-size:12px;font-weight:700;text-decoration:none}
+.linkbtn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;margin-left:6px;background:var(--teal);color:#fff;padding:7px 12px;border-radius:16px;font-size:12px;font-weight:700;text-decoration:none}
+.linkbtn svg{width:13px;height:13px}
+
+.services{display:grid;grid-template-columns:repeat(6,1fr);text-align:center;gap:10px}
+.ico{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;margin:auto;background:var(--sand);color:var(--teal)}
+.ico svg{width:26px;height:26px}
+.services b{display:block;font-size:11px;margin-top:8px}
+
+.hotel{display:grid;grid-template-columns:1.1fr 1fr;gap:20px}
+.hotelimg{height:210px;border-radius:14px;background:var(--hotelimg,linear-gradient(135deg,#4FA8A0,#1F4E4A)) center/cover;background-color:var(--sand)}
+.hotel h3{margin:0;color:var(--teal);font-size:18px}
+.stars{color:var(--coral);letter-spacing:2px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{background:var(--sand);border-radius:16px;padding:6px 11px;font-size:11.5px;color:var(--teal)}
+
+.twocol{display:grid;gap:14px}
+.detail h3{display:flex;justify-content:space-between;color:var(--teal);margin:0 0 12px;font-size:15px}
+.detail p{font-size:12.5px;line-height:1.5;margin:5px 0}
+.iconLabel{display:inline-flex;align-items:center;gap:7px}
+.iconLabel svg{width:17px;height:17px;color:var(--turq);flex-shrink:0}
+.cardtitle.iconLabel svg{width:18px;height:18px}
+
+.experiences{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.exp b{font-size:13px;color:var(--teal)}
+.exp p{font-size:12px;margin:4px 0 0;line-height:1.4}
+
+.price{background:linear-gradient(120deg,var(--sand),#fffaf1);border:1px solid #ead9bd;border-radius:20px;padding:26px;display:grid;grid-template-columns:1.2fr .8fr;align-items:center}
+.price h2{margin:0;color:#8b5d34;font-size:15px}
+.total{font-size:36px;font-weight:800;color:var(--teal);margin:6px 0}
+.per{font-size:13px;color:#6b5a3f}
+.deposit{border-left:1px solid #e1cba8;padding-left:24px}
+.deposit strong{font-size:24px;color:var(--teal)}
+.cta{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:var(--coral);color:#fff;padding:10px 18px;border-radius:18px;font-weight:800;font-size:13px;text-decoration:none;border:0;cursor:pointer}
+.payplan{list-style:none;margin:6px 0 0;padding:0}
+.payplan li{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:5px 0;border-bottom:1px dashed #e1cba8}
+.payplan li:last-child{border-bottom:0}
+.payplan b{color:var(--teal)}
+
+.legal{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.legal>div{padding:15px;border-radius:14px;background:var(--sand);font-size:11.5px;line-height:1.5;color:var(--teal)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center}
+.stepn{width:30px;height:30px;border-radius:50%;background:var(--turq);color:#fff;display:grid;place-items:center;margin:auto;font-weight:800;font-size:13px}
+.steps p{font-size:11.5px;margin:8px 0 0}
+
+.tagline{text-align:center;font-family:Georgia,serif;font-style:italic;color:var(--teal);font-size:14px;padding:14px 0 4px}
+
+.footer{background:linear-gradient(100deg,var(--teal),var(--turq));color:#fff;padding:22px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer h2{font:italic 20px Georgia,serif;margin:0 0 4px}
+.footer small{opacity:.9}
+.socialIcons{display:flex;gap:8px;margin-top:8px}
+.socialIcons a{width:32px;height:32px;border-radius:50%;background:#ffffff2b;display:grid;place-items:center;color:#fff}
+.socialIcons a svg{width:16px;height:16px}
+.reviews{text-align:right}
+.reviews a{color:#fff;text-decoration:none}
+.gold{color:#f5d98b}
+
+/* ---------- WhatsApp message box ---------- */
+.msgBox{max-width:640px;margin:0 auto 30px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+.msgBox h3{margin:0 0 10px;color:var(--teal);font-size:14px}
+.msgBox textarea{min-height:220px;font-size:13px;line-height:1.5}
+
+@media(max-width:900px){
+  .grid,.grid.g2,.grid.g4{grid-template-columns:1fr 1fr}
+  .tripgrid{grid-template-columns:1fr 1fr}
+  .hotel,.twocol,.experiences,.price{grid-template-columns:1fr}
+  .services{grid-template-columns:repeat(3,1fr)}
+  .legal,.steps{grid-template-columns:1fr 1fr}
+  .hero{padding:24px 22px}
+  .hero h1{font-size:32px}
+  .content{padding:0 20px 24px}
+  .heroBottom{justify-content:flex-start}
+  .payRows{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff}
+  .topbar,.previewToolbar,.tabs,.msgBox{display:none !important}
+  .wrap{padding:0;max-width:none}
+  .sheet{box-shadow:none;margin:0;border-radius:0;page-break-after:always}
+  @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">VIAJES CASAL <span>≋</span> Cotizador</div>
+  <button class="secondary" id="btnForm" onclick="showView('form')">Formulario</button>
+  <button class="secondary" id="btnPreview" onclick="showView('preview')" disabled>Vista previa</button>
+</div>
+
+<div class="wrap">
+
+  <!-- ===================== FORM VIEW ===================== -->
+  <section id="formView">
+
+    <div class="formCard">
+      <h2>Datos generales</h2>
+      <div class="hint">Esta información aplica a toda la cotización, aunque incluyas varias propuestas.</div>
+      <div class="grid g4">
+        <div class="field"><label>Folio</label><input id="g_folio" value="COT-2026-00001"></div>
+        <div class="field"><label>Nombre del cliente</label><input id="g_cliente" placeholder="Ej. Familia Gómez"></div>
+        <div class="field"><label>WhatsApp del cliente (opcional)</label><input id="g_clienteTel" placeholder="52155..."></div>
+        <div class="field"><label>Vigencia de la cotización</label><input id="g_vigencia" type="date"></div>
+      </div>
+      <div class="grid g4">
+        <div class="field"><label>Travel Partner</label>
+          <select id="g_partner">
+            <option>Paulina Salazar</option>
+            <option>Eduardo</option>
+          </select>
+        </div>
+        <div class="field"><label>WhatsApp del Travel Partner</label><input id="g_partnerTel" placeholder="52998..."></div>
+        <div class="field"><label>Destino principal</label><input id="g_destino" placeholder="Cancún, Quintana Roo"></div>
+        <div class="field"><label>Pasajeros</label><input id="g_pax" placeholder="2 adultos + 1 menor"></div>
+      </div>
+      <div class="field">
+        <label>Link para ver la cotización en línea (opcional)</label>
+        <input id="g_linkOnline" placeholder="https://viajescasal.com/cotizacion/...">
+        <div class="hint" style="margin-top:6px">Si subes esta cotización a una página web, pega aquí el link. Aparecerá junto a los datos del Travel Partner en el PDF y en el mensaje de WhatsApp, para clientes que prefieren verla en línea en vez de descargar el PDF.</div>
+      </div>
+      <div class="grid g2">
+        <div class="field"><label>Fecha de salida</label><input id="g_fechaSalida" type="date" oninput="updateDurationHint()"></div>
+        <div class="field"><label>Fecha de regreso</label><input id="g_fechaRegreso" type="date" oninput="updateDurationHint()"></div>
+      </div>
+      <div class="durationHint" id="durationHint"></div>
+      <div class="field">
+        <label>Imagen de portada (opcional)</label>
+        <div class="imgUploadRow">
+          <input type="file" accept="image/*" id="g_heroImgFile" onchange="handleImageUpload(event,'hero_global')">
+          <div class="imgPreview" id="preview_hero_global"></div>
+        </div>
+        <div class="hint" style="margin-top:6px">Sube una foto del destino (playa, Europa, Oaxaca...). Si no subes nada, se usa un fondo con los colores de la marca.</div>
+      </div>
+    </div>
+
+    <div class="formCard">
+      <h2>Servicios incluidos</h2>
+      <div class="hint">Marca lo que incluye esta cotización. Las secciones del formulario y de la propuesta se ajustan solas.</div>
+      <div class="svcRow" id="svcRow"></div>
+      <div class="field" style="max-width:420px">
+        <label>¿Qué servicio varía entre las propuestas?</label>
+        <select id="g_varying" onchange="onVaryingChange()"></select>
+      </div>
+      <div class="hint" style="margin-top:-4px">Ese servicio se captura por propuesta (hasta 4 opciones). Los demás servicios marcados se capturan una sola vez porque son iguales en todas las opciones.</div>
+    </div>
+
+    <div class="formCard">
+      <h2>Servicios fijos</h2>
+      <div class="hint" id="fixedHint">Se muestran aquí los servicios marcados que NO son el que varía. Se capturan una sola vez.</div>
+      <div id="fixedServicesContainer"></div>
+    </div>
+
+    <div id="proposalsContainer"></div>
+
+    <div class="addRow">
+      <button id="addPropBtn" onclick="addProposal()">+ Agregar otra propuesta (hasta 4)</button>
+    </div>
+
+    <div class="generateRow">
+      <button class="coral" onclick="generate()">Generar cotización →</button>
+    </div>
+  </section>
+
+  <!-- ===================== PREVIEW VIEW ===================== -->
+  <section id="previewView" hidden>
+    <div class="previewToolbar">
+      <button class="secondary" onclick="showView('form')">← Volver a editar</button>
+      <button onclick="window.print()">Imprimir / Guardar PDF</button>
+      <button class="coral" onclick="copyMessage()">Copiar mensaje de WhatsApp</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div id="sheets"></div>
+
+    <div class="msgBox">
+      <h3>Mensaje para copiar y pegar (WhatsApp / Email)</h3>
+      <textarea id="msgText" readonly></textarea>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- Unified icon set (line icons, single style) ---------- */
+const ICONS = {
+  vuelo: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`,
+  hotel: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="7" rx="1.5"/><path d="M3 11V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3"/><path d="M13 11V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 18v2"/><path d="M21 18v2"/></svg>`,
+  traslados: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17" cy="18.5" r="1.4" fill="currentColor" stroke="none"/></svg>`,
+  tours: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-1 1-2-5 2-1z" fill="currentColor" stroke="none"/></svg>`,
+  seguro: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>`,
+  partner: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2" y="13" width="4" height="6" rx="1.5"/><rect x="18" y="13" width="4" height="6" rx="1.5"/><path d="M20 19v1a3 3 0 0 1-3 3h-3"/></svg>`,
+  tarjeta: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>`,
+  transferencia: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></svg>`,
+  facilidades: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>`,
+  web: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>`,
+  facebook: `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14 9h-2a2 2 0 0 0-2 2v2H8v3h2v6h3v-6h2.2l.3-3H13v-1.5c0-.5.2-1 1-1h1.5V8.2A20 20 0 0 0 14 8Z"/></svg>`,
+  tiktok: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l10-2v11"/><circle cx="7" cy="18" r="2" fill="currentColor" stroke="none"/><circle cx="17" cy="16" r="2" fill="currentColor" stroke="none"/></svg>`,
+  youtube: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M10 9.5l5 2.5-5 2.5v-5z" fill="currentColor" stroke="none"/></svg>`,
+  instagram: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>`,
+  gmaps: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" stroke="none"/></svg>`,
+  link: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M11 7l1-1a3.5 3.5 0 0 1 5 5l-1 1"/><path d="M13 17l-1 1a3.5 3.5 0 0 1-5-5l1-1"/></svg>`
+};
+
+const SOCIAL_LINKS = {
+  web: 'https://viajescasal.com',
+  facebook: 'https://www.facebook.com/share/1GjFtGYqvk/',
+  instagram: 'https://www.instagram.com/viaja.pau?igsh=MW9kd3FxN2hhM2h6dA==',
+  tiktok: 'https://www.tiktok.com/@viajes_bumeran_casal',
+  youtube: 'https://www.youtube.com/@inspirateaviajar',
+  gmaps: 'https://share.google/4S0ONfhO3Wo8Xy5OI'
+};
+
+const SERVICES = [
+  {key:'vuelo',    label:'Vuelo'},
+  {key:'hotel',    label:'Hotel'},
+  {key:'traslados',label:'Traslados'},
+  {key:'tours',    label:'Tours'},
+  {key:'seguro',   label:'Seguro'}
+];
+const DEFAULT_CHECKED = {vuelo:true, hotel:true, traslados:true, tours:false, seguro:false};
+
+let proposals = [];
+let propCounter = 0;
+let imageStore = {}; // key -> base64 dataURL, e.g. 'hero_global', 'hotel_3', 'fix_hotel'
+
+/* ---------- Image upload (client-side, no server needed) ---------- */
+function handleImageUpload(event, key){
+  const file = event.target.files && event.target.files[0];
+  const preview = document.getElementById('preview_'+key);
+  if(!file){
+    delete imageStore[key];
+    if(preview) preview.style.backgroundImage = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    imageStore[key] = e.target.result;
+    if(preview) preview.style.backgroundImage = `url('${e.target.result}')`;
+  };
+  reader.readAsDataURL(file);
+}
+function firstName(fullName){
+  if(!fullName) return '';
+  return fullName.trim().split(/\s+/)[0];
+}
+
+/* ---------- Services row / varying selector ---------- */
+function renderServicesRow(){
+  const row = document.getElementById('svcRow');
+  row.innerHTML = SERVICES.map(s=>`
+    <label class="svcChk">
+      <input type="checkbox" id="g_srv_${s.key}" ${DEFAULT_CHECKED[s.key]?'checked':''} onchange="onServicesChange()">
+      ${s.label}
+    </label>`).join('');
+}
+
+function checkedServices(){
+  return SERVICES.filter(s => document.getElementById('g_srv_'+s.key) && document.getElementById('g_srv_'+s.key).checked).map(s=>s.key);
+}
+
+function onServicesChange(){
+  refreshVaryingOptions();
+  renderFixedServices();
+  fullRenderProposals();
+}
+
+function refreshVaryingOptions(){
+  const checked = checkedServices();
+  const sel = document.getElementById('g_varying');
+  const prev = sel.value;
+  if(checked.length===0){
+    sel.innerHTML = `<option value="">Selecciona al menos un servicio arriba</option>`;
+    return;
+  }
+  sel.innerHTML = checked.map(k=>{
+    const s = SERVICES.find(x=>x.key===k);
+    return `<option value="${k}">${s.label}</option>`;
+  }).join('');
+  if(checked.includes(prev)){
+    sel.value = prev;
+  } else if(checked.includes('hotel')){
+    sel.value = 'hotel';
+  } else {
+    sel.value = checked[0];
+  }
+}
+
+function onVaryingChange(){
+  renderFixedServices();
+  fullRenderProposals();
+}
+
+function getVarying(){
+  return document.getElementById('g_varying').value;
+}
+
+/* ---------- Dates ---------- */
+const MESES_FULL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MESES_SHORT = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+function parseISO(iso){
+  if(!iso) return null;
+  const [y,m,d] = iso.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function computeNights(){
+  const s = parseISO(val('g_fechaSalida'));
+  const e = parseISO(val('g_fechaRegreso'));
+  if(!s||!e) return null;
+  return Math.round((e-s)/86400000);
+}
+function formatDateRange(){
+  const sISO = val('g_fechaSalida'), eISO = val('g_fechaRegreso');
+  const s = parseISO(sISO), e = parseISO(eISO);
+  if(!s||!e) return '';
+  const nights = Math.round((e-s)/86400000);
+  const days = nights + 1;
+  let range;
+  if(s.getFullYear()===e.getFullYear() && s.getMonth()===e.getMonth()){
+    range = `${s.getDate()}–${e.getDate()} ${MESES_FULL[s.getMonth()]} ${s.getFullYear()}`;
+  } else if(s.getFullYear()===e.getFullYear()){
+    range = `${s.getDate()} ${MESES_SHORT[s.getMonth()]} – ${e.getDate()} ${MESES_SHORT[e.getMonth()]} ${s.getFullYear()}`;
+  } else {
+    range = `${s.getDate()} ${MESES_SHORT[s.getMonth()]} ${s.getFullYear()} – ${e.getDate()} ${MESES_SHORT[e.getMonth()]} ${e.getFullYear()}`;
+  }
+  return `${range} · ${days} días / ${nights} noches`;
+}
+function formatSingleDate(iso){
+  const d = parseISO(iso);
+  if(!d) return '';
+  return `${d.getDate()} ${MESES_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+}
+function updateDurationHint(){
+  const txt = formatDateRange();
+  document.getElementById('durationHint').textContent = txt ? '📅 ' + txt : '';
+}
+
+/* ---------- Fixed services (shown once) ---------- */
+function fixedFieldHTML(service){
+  switch(service){
+    case 'vuelo': return `
+      <div class="fixedBlock"><div class="fbTitle">Vuelo (fijo)</div>
+        <div class="grid g2">
+          <div class="field"><label>Aerolínea</label><input id="fix_vuelo_aerolinea" placeholder="Volaris"></div>
+          <div class="field"><label>Origen</label><input id="fix_vuelo_origen" placeholder="CDMX"></div>
+        </div>
+        <div class="grid g2">
+          <div class="field"><label>Hora salida ida</label><input id="fix_vuelo_hsIda" placeholder="08:35"></div>
+          <div class="field"><label>Hora llegada ida</label><input id="fix_vuelo_hlIda" placeholder="11:02"></div>
+        </div>
+        <div class="grid g2">
+          <div class="field"><label>Hora salida regreso</label><input id="fix_vuelo_hsReg" placeholder="17:45"></div>
+          <div class="field"><label>Hora llegada regreso</label><input id="fix_vuelo_hlReg" placeholder="19:55"></div>
+        </div>
+      </div>`;
+    case 'traslados': return `
+      <div class="fixedBlock"><div class="fbTitle">Traslados (fijo)</div>
+        <div class="grid g2">
+          <div class="field"><label>Tipo</label>
+            <select id="fix_traslados_tipo"><option>Redondo</option><option>Solo llegada</option><option>Solo regreso</option></select>
+          </div>
+          <div class="field"><label>Descripción</label><input id="fix_traslados_desc" placeholder="Aeropuerto ↔ Hotel"></div>
+        </div>
+      </div>`;
+    case 'seguro': return `
+      <div class="fixedBlock"><div class="fbTitle">Seguro (fijo)</div>
+        <div class="field"><label>Cobertura</label><textarea id="fix_seguro_cobertura" placeholder="Seguro de viaje con cobertura médica y cancelación"></textarea></div>
+      </div>`;
+    case 'tours': return `
+      <div class="fixedBlock"><div class="fbTitle">Tours / experiencias (fijo)</div>
+        <div class="grid g2">
+          <div class="field"><label>Experiencia 1</label><input id="fix_tours_exp1" placeholder="Xcaret México — día completo"></div>
+          <div class="field"><label>Experiencia 2 (opcional)</label><input id="fix_tours_exp2" placeholder="Catamarán Isla Mujeres"></div>
+        </div>
+      </div>`;
+    case 'hotel': return `
+      <div class="fixedBlock"><div class="fbTitle">Hotel (fijo)</div>
+        <div class="grid g2">
+          <div class="field"><label>Hotel</label><input id="fix_hotel_nombre" placeholder="Hyatt Ziva Cancún"></div>
+          <div class="field"><label>Foto del hotel (opcional)</label>
+            <div class="imgUploadRow">
+              <input type="file" accept="image/*" id="fix_hotel_imgFile" onchange="handleImageUpload(event,'fix_hotel')">
+              <div class="imgPreview" id="preview_fix_hotel"></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid g4">
+          <div class="field"><label>Estrellas</label><select id="fix_hotel_stars"><option>5</option><option>4</option><option>3</option></select></div>
+          <div class="field"><label>Habitación</label><input id="fix_hotel_room" placeholder="Junior Suite"></div>
+          <div class="field"><label>Plan</label><input id="fix_hotel_plan" placeholder="Todo Incluido"></div>
+        </div>
+        <div class="field"><label>Descripción</label><textarea id="fix_hotel_desc"></textarea></div>
+      </div>`;
+  }
+  return '';
+}
+
+function renderFixedServices(){
+  const checked = checkedServices();
+  const varying = getVarying();
+  const fixed = checked.filter(k => k!==varying);
+  const container = document.getElementById('fixedServicesContainer');
+  const hint = document.getElementById('fixedHint');
+  if(fixed.length===0){
+    container.innerHTML = `<div class="hint">No hay servicios fijos: solo capturarás el servicio que varía dentro de cada propuesta.</div>`;
+  } else {
+    container.innerHTML = fixed.map(fixedFieldHTML).join('');
+  }
+}
+
+/* ---------- Proposals (the varying service, up to 4) ---------- */
+function newProposalObj(){
+  propCounter++;
+  return { id: propCounter };
+}
+function addProposal(){
+  if(proposals.length >= 4){ return; }
+  const p = newProposalObj();
+  proposals.push(p);
+  const varying = getVarying();
+  const idx = proposals.length - 1;
+  document.getElementById('proposalsContainer').insertAdjacentHTML('beforeend', proposalFormHTML(p, idx, varying));
+  document.getElementById('addPropBtn').disabled = proposals.length>=4;
+  updateProposalTitles();
+  updateRemoveButtonsVisibility();
+}
+function removeProposal(id){
+  proposals = proposals.filter(p=>p.id!==id);
+  const node = document.querySelector(`.proposal[data-id="${id}"]`);
+  if(node) node.remove();
+  document.getElementById('addPropBtn').disabled = proposals.length>=4;
+  updateProposalTitles();
+  updateRemoveButtonsVisibility();
+}
+
+function varyingFieldsHTML(service, pid){
+  switch(service){
+    case 'vuelo': return `
+      <div class="grid g2">
+        <div class="field"><label>Aerolínea</label><input id="p${pid}_aerolinea" placeholder="Volaris"></div>
+        <div class="field"><label>Origen</label><input id="p${pid}_origen" placeholder="CDMX"></div>
+      </div>
+      <div class="grid g2">
+        <div class="field"><label>Hora salida ida</label><input id="p${pid}_hsIda" placeholder="08:35"></div>
+        <div class="field"><label>Hora llegada ida</label><input id="p${pid}_hlIda" placeholder="11:02"></div>
+      </div>
+      <div class="grid g2">
+        <div class="field"><label>Hora salida regreso</label><input id="p${pid}_hsReg" placeholder="17:45"></div>
+        <div class="field"><label>Hora llegada regreso</label><input id="p${pid}_hlReg" placeholder="19:55"></div>
+      </div>`;
+    case 'traslados': return `
+      <div class="grid g2">
+        <div class="field"><label>Tipo</label>
+          <select id="p${pid}_tipo"><option>Redondo</option><option>Solo llegada</option><option>Solo regreso</option></select>
+        </div>
+        <div class="field"><label>Descripción</label><input id="p${pid}_desc" placeholder="Aeropuerto ↔ Hotel"></div>
+      </div>`;
+    case 'seguro': return `
+      <div class="field"><label>Cobertura</label><textarea id="p${pid}_cobertura" placeholder="Seguro de viaje con cobertura médica y cancelación"></textarea></div>`;
+    case 'tours': return `
+      <div class="grid g2">
+        <div class="field"><label>Experiencia 1</label><input id="p${pid}_exp1" placeholder="Xcaret México — día completo"></div>
+        <div class="field"><label>Experiencia 2 (opcional)</label><input id="p${pid}_exp2" placeholder="Catamarán Isla Mujeres"></div>
+      </div>`;
+    case 'hotel': default: return `
+      <div class="grid g2">
+        <div class="field"><label>Hotel</label><input id="p${pid}_hotel" placeholder="Hyatt Ziva Cancún"></div>
+        <div class="field"><label>Foto del hotel (opcional)</label>
+          <div class="imgUploadRow">
+            <input type="file" accept="image/*" id="p${pid}_imgFile" onchange="handleImageUpload(event,'hotel_${pid}')">
+            <div class="imgPreview" id="preview_hotel_${pid}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid g4">
+        <div class="field"><label>Estrellas</label><select id="p${pid}_stars"><option>5</option><option>4</option><option>3</option></select></div>
+        <div class="field"><label>Habitación</label><input id="p${pid}_room" placeholder="Junior Suite Ocean View"></div>
+        <div class="field"><label>Plan</label><input id="p${pid}_plan" placeholder="Todo Incluido"></div>
+      </div>
+      <div class="field"><label>Descripción breve</label><textarea id="p${pid}_desc" placeholder="Un resort frente al Caribe, ideal para disfrutar el viaje sin preocuparte por los detalles."></textarea></div>`;
+  }
+}
+
+function proposalFormHTML(p, idx, varying){
+  const svc = SERVICES.find(s=>s.key===varying);
+  return `
+  <div class="proposal" data-id="${p.id}">
+    <div class="pTitle">
+      <b>Propuesta ${idx+1}${svc?' · '+svc.label+' que varía':''}</b>
+      <button class="removeBtn" onclick="removeProposal(${p.id})" style="display:${proposals.length>1?'inline-block':'none'}">Eliminar propuesta</button>
+    </div>
+    ${varying ? varyingFieldsHTML(varying, p.id) : `<div class="hint">Selecciona un servicio arriba para capturar esta propuesta.</div>`}
+    <div class="grid g4">
+      <div class="field"><label>Precio total (MXN)</label><input id="p${p.id}_total" placeholder="32850"></div>
+      <div class="field"><label>Precio por persona (MXN)</label><input id="p${p.id}_pp" placeholder="10950"></div>
+      <div class="field"><label>Base pasajeros</label><input id="p${p.id}_base" placeholder="3 pasajeros"></div>
+      <div class="field"><label>Esquema de pago</label>
+        <select id="p${p.id}_esquema" onchange="togglePayScheme(${p.id})">
+          <option value="anticipo">Anticipo + saldo</option>
+          <option value="plan">Plan de pagos (varias fechas)</option>
+        </select>
+      </div>
+    </div>
+    <div class="payScheme" id="payAnticipo_${p.id}">
+      <div class="grid g2">
+        <div class="field"><label>Anticipo (MXN)</label><input id="p${p.id}_anticipo" placeholder="8213"></div>
+        <div class="field"><label>Fecha límite de anticipo</label><input id="p${p.id}_anticipoFecha" type="date"></div>
+      </div>
+    </div>
+    <div class="payScheme" id="payPlan_${p.id}" hidden>
+      <div class="hint" style="margin-bottom:0">Define hasta 3 pagos con su fecha y monto (por ejemplo: anticipo, segundo pago y liquidación).</div>
+      <div class="payRows">
+        <div class="payRow"><label>Pago 1</label><input id="p${p.id}_pago1_fecha" type="date"><input id="p${p.id}_pago1_monto" placeholder="$ monto" style="margin-top:6px"></div>
+        <div class="payRow"><label>Pago 2</label><input id="p${p.id}_pago2_fecha" type="date"><input id="p${p.id}_pago2_monto" placeholder="$ monto" style="margin-top:6px"></div>
+        <div class="payRow"><label>Pago 3 (liquidación)</label><input id="p${p.id}_pago3_fecha" type="date"><input id="p${p.id}_pago3_monto" placeholder="$ monto" style="margin-top:6px"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function togglePayScheme(pid){
+  const esquema = val(`p${pid}_esquema`);
+  const antEl = document.getElementById(`payAnticipo_${pid}`);
+  const planEl = document.getElementById(`payPlan_${pid}`);
+  if(antEl) antEl.hidden = esquema!=='anticipo';
+  if(planEl) planEl.hidden = esquema!=='plan';
+}
+
+/* Full rebuild: only used when the services/varying config changes (field structure changes,
+   so previously entered service-specific values legitimately reset). */
+function fullRenderProposals(){
+  const varying = getVarying();
+  const c = document.getElementById('proposalsContainer');
+  c.innerHTML = proposals.map((p,i)=>proposalFormHTML(p,i,varying)).join('');
+  document.getElementById('addPropBtn').disabled = proposals.length>=4;
+}
+
+/* Incremental helpers: used by add/remove so existing proposals keep their entered data. */
+function updateProposalTitles(){
+  const varying = getVarying();
+  const svc = SERVICES.find(s=>s.key===varying);
+  document.querySelectorAll('#proposalsContainer .proposal').forEach((node, idx)=>{
+    const b = node.querySelector('.pTitle b');
+    if(b) b.textContent = `Propuesta ${idx+1}${svc?' · '+svc.label+' que varía':''}`;
+  });
+}
+function updateRemoveButtonsVisibility(){
+  const show = proposals.length>1;
+  document.querySelectorAll('#proposalsContainer .removeBtn').forEach(btn=>{
+    btn.style.display = show ? 'inline-block' : 'none';
+  });
+}
+
+/* ---------- Helpers ---------- */
+function val(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function money(n){
+  const num = parseFloat((n||'0').toString().replace(/[^0-9.]/g,''));
+  if(isNaN(num)) return n||'';
+  return '$' + num.toLocaleString('es-MX',{maximumFractionDigits:0}) + ' MXN';
+}
+
+function collectGlobal(){
+  return {
+    folio: val('g_folio'),
+    cliente: val('g_cliente') || 'Nombre del cliente',
+    clienteTel: val('g_clienteTel'),
+    vigencia: val('g_vigencia'),
+    partner: val('g_partner'),
+    partnerTel: val('g_partnerTel'),
+    linkOnline: val('g_linkOnline'),
+    destino: val('g_destino') || 'Destino por confirmar',
+    pax: val('g_pax'),
+    fechaSalida: val('g_fechaSalida'),
+    fechaRegreso: val('g_fechaRegreso'),
+    fechasTexto: formatDateRange(),
+    heroImgData: imageStore['hero_global'] || '',
+    services: {
+      vuelo: checkedServices().includes('vuelo'),
+      hotel: checkedServices().includes('hotel'),
+      traslados: checkedServices().includes('traslados'),
+      tours: checkedServices().includes('tours'),
+      seguro: checkedServices().includes('seguro')
+    },
+    varying: getVarying()
+  };
+}
+
+function collectFixedData(g){
+  const out = {};
+  const fixed = checkedServices().filter(k=>k!==g.varying);
+  fixed.forEach(service=>{
+    if(service==='vuelo') out.vuelo = {
+      aerolinea: val('fix_vuelo_aerolinea'), origen: val('fix_vuelo_origen'),
+      hsIda: val('fix_vuelo_hsIda'), hlIda: val('fix_vuelo_hlIda'),
+      hsReg: val('fix_vuelo_hsReg'), hlReg: val('fix_vuelo_hlReg')
+    };
+    if(service==='traslados') out.traslados = { tipo: val('fix_traslados_tipo'), desc: val('fix_traslados_desc') };
+    if(service==='seguro') out.seguro = { cobertura: val('fix_seguro_cobertura') };
+    if(service==='tours') out.tours = { exp1: val('fix_tours_exp1'), exp2: val('fix_tours_exp2') };
+    if(service==='hotel') out.hotel = {
+      hotel: val('fix_hotel_nombre'), imgData: imageStore['fix_hotel']||'', stars: val('fix_hotel_stars')||'5',
+      room: val('fix_hotel_room'), plan: val('fix_hotel_plan'), desc: val('fix_hotel_desc')
+    };
+  });
+  return out;
+}
+
+function collectVaryingData(varying, pid){
+  if(varying==='vuelo') return {
+    aerolinea: val(`p${pid}_aerolinea`), origen: val(`p${pid}_origen`),
+    hsIda: val(`p${pid}_hsIda`), hlIda: val(`p${pid}_hlIda`),
+    hsReg: val(`p${pid}_hsReg`), hlReg: val(`p${pid}_hlReg`)
+  };
+  if(varying==='traslados') return { tipo: val(`p${pid}_tipo`), desc: val(`p${pid}_desc`) };
+  if(varying==='seguro') return { cobertura: val(`p${pid}_cobertura`) };
+  if(varying==='tours') return { exp1: val(`p${pid}_exp1`), exp2: val(`p${pid}_exp2`) };
+  if(varying==='hotel') return {
+    hotel: val(`p${pid}_hotel`), imgData: imageStore[`hotel_${pid}`]||'', stars: val(`p${pid}_stars`)||'5',
+    room: val(`p${pid}_room`), plan: val(`p${pid}_plan`), desc: val(`p${pid}_desc`)
+  };
+  return {};
+}
+
+function collectPaymentPlan(pid){
+  const esquema = val(`p${pid}_esquema`) || 'anticipo';
+  if(esquema==='plan'){
+    const pagos = [1,2,3].map(n=>({
+      label: n===3 ? 'Pago 3 (liquidación)' : `Pago ${n}`,
+      fecha: val(`p${pid}_pago${n}_fecha`),
+      monto: val(`p${pid}_pago${n}_monto`)
+    })).filter(p=>p.fecha || p.monto);
+    return { esquema, pagos };
+  }
+  return { esquema, anticipo: val(`p${pid}_anticipo`), anticipoFecha: val(`p${pid}_anticipoFecha`) };
+}
+
+function collectProposal(p, g, fixedData){
+  const data = Object.assign({}, fixedData);
+  data[g.varying] = collectVaryingData(g.varying, p.id);
+  data.price = {
+    total: val(`p${p.id}_total`), pp: val(`p${p.id}_pp`),
+    base: val(`p${p.id}_base`)
+  };
+  data.pay = collectPaymentPlan(p.id);
+  return data;
+}
+
+/* ---------- Preview rendering ---------- */
+function sheetHTML(g, d, idx){
+  const price = d.price;
+  const totalNum = parseFloat((price.total||'0').replace(/[^0-9.]/g,'')) || 0;
+
+  const heroImg = g.heroImgData || '';
+  const hotelImg = (d.hotel && d.hotel.imgData) ? d.hotel.imgData : '';
+  const heroStyle = heroImg ? `style="--heroimg:url('${heroImg}')"` : '';
+  const hotelStyle = hotelImg ? `style="--hotelimg:url('${hotelImg}')"` : '';
+  const partnerDigits = g.partnerTel ? g.partnerTel.replace(/[^0-9]/g,'') : '';
+  const waLink = partnerDigits ? `https://wa.me/${partnerDigits}` : '#';
+  const vigenciaTxt = g.vigencia ? formatSingleDate(g.vigencia) : '—';
+  const clienteNombre = firstName(g.cliente) || g.cliente;
+
+  // TU VIAJE INCLUYE icons
+  const activeServices = SERVICES.filter(s=>g.services[s.key]);
+  const svcIcons = activeServices.map(s=>`<div><span class="ico">${ICONS[s.key]}</span><b>${s.label}</b></div>`).join('');
+  const includeIcons = svcIcons + `<div><span class="ico">${ICONS.partner}</span><b>Travel Partner</b></div>`;
+  const includeCols = activeServices.length + 1;
+
+  // Hotel card
+  let hotelCard = '';
+  if(g.services.hotel && d.hotel){
+    const stars = '★'.repeat(parseInt(d.hotel.stars,10)||5);
+    hotelCard = `
+      <section class="card hotel">
+        <div class="hotelimg" ${hotelStyle}></div>
+        <div>
+          <div class="lbl">Tu hotel</div>
+          <h3>${d.hotel.hotel||'Hotel por confirmar'}</h3>
+          <div class="stars">${stars}</div>
+          ${d.hotel.room?`<p>${d.hotel.room}</p>`:''}
+          ${d.hotel.plan?`<p><b>Plan:</b> ${d.hotel.plan}</p>`:''}
+          ${g.fechasTexto?`<p><b>Estancia:</b> ${g.fechasTexto}</p>`:''}
+          <div class="chips">
+            <span class="chip">✓ Acompañamiento Viajes Casal</span>
+            <span class="chip">✓ Reserva verificada</span>
+          </div>
+          ${d.hotel.desc?`<p>${d.hotel.desc}</p>`:''}
+        </div>
+      </section>`;
+  }
+
+  // Vuelo + Traslados row
+  let vueloCard='', trasladosCard='';
+  if(g.services.vuelo && d.vuelo){
+    const ida = g.fechaSalida ? `${formatSingleDate(g.fechaSalida)} | ${d.vuelo.origen||''} → ${g.destino} | ${d.vuelo.hsIda||''}${d.vuelo.hlIda?'–'+d.vuelo.hlIda:''}` : '';
+    const regreso = g.fechaRegreso ? `${formatSingleDate(g.fechaRegreso)} | ${g.destino} → ${d.vuelo.origen||''} | ${d.vuelo.hsReg||''}${d.vuelo.hlReg?'–'+d.vuelo.hlReg:''}` : '';
+    vueloCard = `
+      <section class="card detail">
+        <h3><span class="iconLabel">${ICONS.vuelo}Vuelo</span><span>${d.vuelo.aerolinea||''}</span></h3>
+        ${ida?`<p><b>Ida:</b> ${ida}</p>`:''}
+        ${regreso?`<p><b>Regreso:</b> ${regreso}</p>`:''}
+        <p><b>Equipaje:</b> artículo personal + equipaje de mano</p>
+      </section>`;
+  }
+  if(g.services.traslados && d.traslados){
+    trasladosCard = `
+      <section class="card detail">
+        <h3><span class="iconLabel">${ICONS.traslados}Traslados</span><span>${d.traslados.tipo||''}</span></h3>
+        <p>${d.traslados.desc||'Servicio coordinado según tus horarios de vuelo.'}</p>
+      </section>`;
+  }
+  const twoColItems = [vueloCard, trasladosCard].filter(Boolean);
+  const twoColHTML = twoColItems.length ? `<div class="twocol" style="grid-template-columns:${twoColItems.length>1?'1fr 1fr':'1fr'}">${twoColItems.join('')}</div>` : '';
+
+  // Tours card
+  let toursCard = '';
+  if(g.services.tours && d.tours && (d.tours.exp1 || d.tours.exp2)){
+    toursCard = `
+      <section class="card"><div class="cardtitle iconLabel">${ICONS.tours}EXPERIENCIAS PARA TU VIAJE</div>
+        <div class="experiences">
+          ${d.tours.exp1?`<div class="exp"><b>${d.tours.exp1}</b></div>`:''}
+          ${d.tours.exp2?`<div class="exp"><b>${d.tours.exp2}</b></div>`:''}
+        </div>
+      </section>`;
+  }
+
+  // Seguro card
+  let seguroCard = '';
+  if(g.services.seguro && d.seguro){
+    seguroCard = `
+      <section class="card"><div class="cardtitle iconLabel">${ICONS.seguro}SEGURO DE VIAJE</div>
+        <p style="font-size:13px;line-height:1.5">${d.seguro.cobertura||'Cobertura por confirmar.'}</p>
+        ${g.fechasTexto?`<p style="font-size:12px;color:#6b8580"><b>Vigencia del seguro:</b> ${g.fechasTexto}</p>`:''}
+      </section>`;
+  }
+
+  return `
+  <div class="sheet" id="sheet-${idx}">
+    <section class="hero" ${heroStyle}>
+      <div class="heroTop">
+        <div class="brandmark">VIAJES CASAL <span class="wave">≋</span></div>
+      </div>
+      <div>
+        <div class="greeting">Hola, ${clienteNombre} — preparamos esto pensando en ti</div>
+        <h1>Tu próxima<br>experiencia</h1>
+        <p class="partnerMsg">Tu Travel Partner, <b>${g.partner}</b>, armó esta propuesta a tu medida — con cada detalle listo para que solo te enfoques en disfrutarla.</p>
+      </div>
+      <div class="heroBottom">
+        <div class="quotebox">
+          <small>COTIZACIÓN</small>
+          <strong>${g.folio}${proposals.length>1?'-'+(idx+1):''}</strong>
+          <span>Vigencia: ${vigenciaTxt}</span>
+          ${proposals.length>1?`<span class="propTag">Propuesta ${idx+1} de ${proposals.length}</span>`:''}
+        </div>
+      </div>
+    </section>
+    <div class="content">
+      <section class="card trip">
+        <div class="cardtitle">≋ INFORMACIÓN DE TU VIAJE</div>
+        <div class="tripgrid">
+          <div><div class="lbl">Viajero</div><div class="val">${g.cliente}</div></div>
+          <div><div class="lbl">Pasajeros</div><div class="val">${g.pax||'—'}</div></div>
+          <div><div class="lbl">Fechas</div><div class="val">${g.fechasTexto||'—'}</div></div>
+          <div><div class="lbl">Destino</div><div class="val">${g.destino}</div></div>
+          <div class="support">
+            <b>TU TRAVEL PARTNER</b>
+            <div class="val">${g.partner}</div>
+            ${g.partnerTel?`<a class="wabtn" href="${waLink}" target="_blank">WhatsApp ↗</a>`:''}
+            ${g.linkOnline?`<a class="linkbtn" href="${g.linkOnline}" target="_blank">${ICONS.link}Ver en línea</a>`:''}
+          </div>
+        </div>
+      </section>
+
+      <section class="card"><div class="cardtitle">≋ TU VIAJE INCLUYE</div>
+        <div class="services" style="grid-template-columns:repeat(${includeCols},1fr)">${includeIcons}</div>
+      </section>
+
+      ${hotelCard}
+      ${twoColHTML}
+      ${toursCard}
+      ${seguroCard}
+
+      <section class="price">
+        <div>
+          <h2>INVERSIÓN DE TU VIAJE</h2>
+          <div class="total">${money(price.total)}</div>
+          <div class="per">${price.pp?money(price.pp)+' por persona · ':''}${price.base?'Base '+price.base:''}</div>
+          ${partnerDigits
+            ? `<a class="cta" href="${waLink}?text=${encodeURIComponent('Hola '+g.partner+', quiero reservar mi viaje — Cotización '+g.folio+(proposals.length>1?'-'+(idx+1):'')+'. ¡Vamos con esta opción!')}" target="_blank">RESERVAR MI VIAJE →</a>`
+            : `<span class="cta">RESERVAR MI VIAJE →</span>`}
+        </div>
+        <div class="deposit">
+          ${d.pay && d.pay.esquema==='plan' && d.pay.pagos && d.pay.pagos.length
+            ? `<span>PLAN DE PAGOS</span>
+               <ul class="payplan">
+                 ${d.pay.pagos.map(p=>`<li><span>${p.label}${p.fecha?' · '+formatSingleDate(p.fecha):''}</span><b>${money(p.monto)}</b></li>`).join('')}
+               </ul>`
+            : `<span>APARTA TU VIAJE CON</span><br>
+               <strong>${money(d.pay?d.pay.anticipo:'')}</strong>
+               <p>Saldo pendiente: ${money(totalNum - (parseFloat(((d.pay&&d.pay.anticipo)||'0').replace(/[^0-9.]/g,''))||0))}</p>
+               <p><b>Vigencia:</b> ${d.pay&&d.pay.anticipoFecha?formatSingleDate(d.pay.anticipoFecha):vigenciaTxt}</p>`}
+        </div>
+      </section>
+
+      <section class="card"><div class="cardtitle">FORMAS DE PAGO</div>
+        <div class="services" style="grid-template-columns:repeat(3,1fr)">
+          <div><span class="ico">${ICONS.tarjeta}</span><b>Tarjeta</b></div>
+          <div><span class="ico">${ICONS.transferencia}</span><b>Transferencia</b></div>
+          <div><span class="ico">${ICONS.facilidades}</span><b>Facilidades</b></div>
+        </div>
+      </section>
+
+      <section class="legal">
+        <div><b>ⓘ INFORMACIÓN IMPORTANTE</b><p>Tarifas sujetas a disponibilidad. Impuestos locales pueden pagarse directamente en destino cuando corresponda.</p></div>
+        <div><b>⚙ POLÍTICAS</b><p>Cambios, cancelaciones y reembolsos están sujetos a las condiciones de cada proveedor.</p></div>
+        <div><b>◇ ESTA COTIZACIÓN</b><p>La tarifa no queda garantizada hasta confirmar disponibilidad y realizar el pago correspondiente.</p></div>
+      </section>
+
+      <section class="card"><div class="cardtitle">¿LISTO PARA VIAJAR?</div>
+        <div class="steps">
+          <div><span class="stepn">1</span><p>Confirma que la propuesta te gusta</p></div>
+          <div><span class="stepn">2</span><p>Verificamos disponibilidad</p></div>
+          <div><span class="stepn">3</span><p>Realizas tu anticipo</p></div>
+          <div><span class="stepn">4</span><p>Recibes tu confirmación</p></div>
+        </div>
+      </section>
+
+      <div class="tagline">"Viajar tranquilo también se planea."</div>
+    </div>
+    <footer class="footer">
+      <div><h2>¡Gracias por permitirnos ser parte de tu próximo viaje!</h2><small>Estamos contigo antes, durante y después de tu viaje.</small></div>
+      <div>
+        <div class="socialIcons">
+          <a href="${SOCIAL_LINKS.web}" target="_blank" aria-label="Sitio web">${ICONS.web}</a>
+          <a href="${SOCIAL_LINKS.instagram}" target="_blank" aria-label="Instagram">${ICONS.instagram}</a>
+          <a href="${SOCIAL_LINKS.facebook}" target="_blank" aria-label="Facebook">${ICONS.facebook}</a>
+          <a href="${SOCIAL_LINKS.tiktok}" target="_blank" aria-label="TikTok">${ICONS.tiktok}</a>
+          <a href="${SOCIAL_LINKS.youtube}" target="_blank" aria-label="YouTube">${ICONS.youtube}</a>
+        </div>
+        <small style="letter-spacing:0">viajescasal.com</small>
+      </div>
+      <div class="reviews"><a href="${SOCIAL_LINKS.gmaps}" target="_blank">Conoce nuestras reseñas<br><span class="gold">★★★★★</span></a></div>
+    </footer>
+  </div>`;
+}
+
+function optionLabel(g, d){
+  const v = g.varying;
+  if(v==='hotel') return (d.hotel && d.hotel.hotel) ? d.hotel.hotel + (d.hotel.plan?' — '+d.hotel.plan:'') : 'Hotel por confirmar';
+  if(v==='vuelo') return (d.vuelo && d.vuelo.aerolinea) ? 'Vuelo ' + d.vuelo.aerolinea : 'Vuelo';
+  if(v==='traslados') return 'Traslados' + (d.traslados && d.traslados.tipo ? ' — '+d.traslados.tipo : '');
+  if(v==='seguro') return 'Seguro de viaje';
+  if(v==='tours') return (d.tours && d.tours.exp1) ? d.tours.exp1 : 'Tours';
+  return 'Propuesta';
+}
+
+function buildMessage(g, dataList){
+  let msg = `¡Hola${g.cliente!=='Nombre del cliente'?' '+g.cliente:''}! 👋 Soy ${g.partner}, tu Travel Partner en Viajes Casal.\n\n`;
+  msg += `Aquí tienes tu${dataList.length>1?'s propuestas':' propuesta'} para tu viaje a ${g.destino}`;
+  if(g.fechasTexto) msg += ` (${g.fechasTexto})`;
+  msg += `:\n\n`;
+  dataList.forEach((d,i)=>{
+    msg += `${i+1}️⃣ *${optionLabel(g,d)}*\n`;
+    msg += `   💰 ${money(d.price.total)}${d.price.pp?' ('+money(d.price.pp)+' por persona)':''}\n\n`;
+  });
+  msg += `Esta propuesta incluye ${SERVICES.filter(s=>g.services[s.key]).map(s=>s.label.toLowerCase()).join(', ')} y mi acompañamiento antes, durante y después de tu viaje.\n\n`;
+  msg += `Te comparto también el PDF con todos los detalles 📄\n`;
+  if(g.linkOnline) msg += `También puedes verla en línea aquí: ${g.linkOnline}\n`;
+  msg += `\nCualquier duda aquí estoy. Viajar tranquilo también se planea. ✈️🌊\n`;
+  msg += `— ${g.partner} · Viajes Casal`;
+  return msg;
+}
+
+function generate(){
+  const checked = checkedServices();
+  if(checked.length===0){ alert('Marca al menos un servicio (Vuelo, Hotel, Traslados, Tours o Seguro) antes de generar.'); return; }
+  if(proposals.length===0){ addProposal(); }
+
+  const g = collectGlobal();
+  const fixedData = collectFixedData(g);
+  const dataList = proposals.map(p => collectProposal(p, g, fixedData));
+
+  const sheets = document.getElementById('sheets');
+  sheets.innerHTML = dataList.map((d,i)=>sheetHTML(g,d,i)).join('');
+
+  const tabs = document.getElementById('tabs');
+  if(dataList.length>1){
+    tabs.innerHTML = dataList.map((d,i)=>`<button onclick="showTab(${i})" id="tabBtn-${i}">Propuesta ${i+1} · ${optionLabel(g,d)}</button>`).join('');
+  } else {
+    tabs.innerHTML = '';
+  }
+  showTab(0);
+
+  document.getElementById('msgText').value = buildMessage(g, dataList);
+  document.getElementById('btnPreview').disabled = false;
+  showView('preview');
+}
+
+function showTab(i){
+  document.querySelectorAll('#sheets .sheet').forEach((s,idx)=>{ s.style.display = (idx===i)?'block':'none'; });
+  document.querySelectorAll('#tabs button').forEach((b,idx)=>{ b.classList.toggle('active', idx===i); });
+}
+
+function showView(view){
+  document.getElementById('formView').hidden = view!=='form';
+  document.getElementById('previewView').hidden = view!=='preview';
+}
+
+function copyMessage(){
+  const t = document.getElementById('msgText');
+  t.select();
+  navigator.clipboard.writeText(t.value).then(()=>{
+    alert('Mensaje copiado. Ya puedes pegarlo en WhatsApp o correo.');
+  }).catch(()=>{
+    document.execCommand('copy');
+    alert('Mensaje copiado.');
+  });
+}
+
+/* ---------- Init ---------- */
+renderServicesRow();
+refreshVaryingOptions();
+renderFixedServices();
+addProposal();
+</script>
+</body>
+</html>
