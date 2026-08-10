@@ -349,6 +349,41 @@ function firstName(fullName){
   return fullName.trim().split(/\s+/)[0];
 }
 
+/* ---------- Tours: complementary add-on, up to 3 suggested options with photo + price ---------- */
+function tourSlotHTML(prefix, n){
+  const key = `${prefix}_t${n}`;
+  return `
+    <div class="fixedBlock" style="margin-top:10px">
+      <div class="fbTitle">Tour ${n}${n>1?' (opcional)':''}</div>
+      <div class="grid g2">
+        <div class="field"><label>Nombre del tour</label><input id="${key}_nombre" placeholder="Xcaret México — día completo"></div>
+        <div class="field"><label>Foto (opcional)</label>
+          <div class="imgUploadRow">
+            <input type="file" accept="image/*" id="${key}_imgFile" onchange="handleImageUpload(event,'${key}')">
+            <div class="imgPreview" id="preview_${key}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="field"><label>Precio adicional</label><input id="${key}_precio" placeholder="$450 MXN por persona (o escribe &quot;Gratis&quot;)"></div>
+        <div class="field"><label>Descripción breve (opcional)</label><input id="${key}_desc" placeholder="Snorkel, tirolesas y río subterráneo"></div>
+      </div>
+    </div>`;
+}
+function toursFieldsHTML(prefix){
+  return `
+    <div class="field"><label>Mensaje promocional (opcional)</label><input id="${prefix}_promo" placeholder="Ej. Tours gratis: elige 1 de las siguientes 3 opciones"></div>
+    ${tourSlotHTML(prefix,1)}${tourSlotHTML(prefix,2)}${tourSlotHTML(prefix,3)}`;
+}
+function collectToursData(prefix){
+  const promo = val(`${prefix}_promo`);
+  const items = [1,2,3].map(n=>{
+    const key = `${prefix}_t${n}`;
+    return { nombre: val(`${key}_nombre`), precio: val(`${key}_precio`), desc: val(`${key}_desc`), imgData: imageStore[key]||'' };
+  }).filter(t=>t.nombre);
+  return { promo, items };
+}
+
 /* ---------- Services row / varying selector ---------- */
 function renderServicesRow(){
   const row = document.getElementById('svcRow');
@@ -472,11 +507,9 @@ function fixedFieldHTML(service){
         <div class="field"><label>Cobertura</label><textarea id="fix_seguro_cobertura" placeholder="Seguro de viaje con cobertura médica y cancelación"></textarea></div>
       </div>`;
     case 'tours': return `
-      <div class="fixedBlock"><div class="fbTitle">Tours / experiencias (fijo)</div>
-        <div class="grid g2">
-          <div class="field"><label>Experiencia 1</label><input id="fix_tours_exp1" placeholder="Xcaret México — día completo"></div>
-          <div class="field"><label>Experiencia 2 (opcional)</label><input id="fix_tours_exp2" placeholder="Catamarán Isla Mujeres"></div>
-        </div>
+      <div class="fixedBlock"><div class="fbTitle">Tours / experiencias (fijo) · servicio complementario</div>
+        <div class="hint" style="margin:-2px 0 4px">Se ofrecen como agregado con precio adicional, no forman parte del paquete base.</div>
+        ${toursFieldsHTML('fix_tours')}
       </div>`;
     case 'hotel': return `
       <div class="fixedBlock"><div class="fbTitle">Hotel (fijo)</div>
@@ -563,10 +596,8 @@ function varyingFieldsHTML(service, pid){
     case 'seguro': return `
       <div class="field"><label>Cobertura</label><textarea id="p${pid}_cobertura" placeholder="Seguro de viaje con cobertura médica y cancelación"></textarea></div>`;
     case 'tours': return `
-      <div class="grid g2">
-        <div class="field"><label>Experiencia 1</label><input id="p${pid}_exp1" placeholder="Xcaret México — día completo"></div>
-        <div class="field"><label>Experiencia 2 (opcional)</label><input id="p${pid}_exp2" placeholder="Catamarán Isla Mujeres"></div>
-      </div>`;
+      <div class="hint" style="margin:-2px 0 4px">Se ofrecen como agregado con precio adicional, no forman parte del paquete base.</div>
+      ${toursFieldsHTML(`p${pid}_tours`)}`;
     case 'hotel': default: return `
       <div class="grid g2">
         <div class="field"><label>Hotel</label><input id="p${pid}_hotel" placeholder="Hyatt Ziva Cancún"></div>
@@ -701,7 +732,7 @@ function collectFixedData(g){
     };
     if(service==='traslados') out.traslados = { tipo: val('fix_traslados_tipo'), desc: val('fix_traslados_desc') };
     if(service==='seguro') out.seguro = { cobertura: val('fix_seguro_cobertura') };
-    if(service==='tours') out.tours = { exp1: val('fix_tours_exp1'), exp2: val('fix_tours_exp2') };
+    if(service==='tours') out.tours = collectToursData('fix_tours');
     if(service==='hotel') out.hotel = {
       hotel: val('fix_hotel_nombre'), imgData: imageStore['fix_hotel']||'', stars: val('fix_hotel_stars')||'5',
       room: val('fix_hotel_room'), plan: val('fix_hotel_plan'), desc: val('fix_hotel_desc')
@@ -718,7 +749,7 @@ function collectVaryingData(varying, pid){
   };
   if(varying==='traslados') return { tipo: val(`p${pid}_tipo`), desc: val(`p${pid}_desc`) };
   if(varying==='seguro') return { cobertura: val(`p${pid}_cobertura`) };
-  if(varying==='tours') return { exp1: val(`p${pid}_exp1`), exp2: val(`p${pid}_exp2`) };
+  if(varying==='tours') return collectToursData(`p${pid}_tours`);
   if(varying==='hotel') return {
     hotel: val(`p${pid}_hotel`), imgData: imageStore[`hotel_${pid}`]||'', stars: val(`p${pid}_stars`)||'5',
     room: val(`p${pid}_room`), plan: val(`p${pid}_plan`), desc: val(`p${pid}_desc`)
@@ -764,8 +795,8 @@ function sheetHTML(g, d, idx){
   const vigenciaTxt = g.vigencia ? formatSingleDate(g.vigencia) : '—';
   const clienteNombre = firstName(g.cliente) || g.cliente;
 
-  // TU VIAJE INCLUYE icons
-  const activeServices = SERVICES.filter(s=>g.services[s.key]);
+  // TU VIAJE INCLUYE icons (tours is a paid complement, not part of the base package list)
+  const activeServices = SERVICES.filter(s=>g.services[s.key] && s.key!=='tours');
   const svcIcons = activeServices.map(s=>`<div><span class="ico">${ICONS[s.key]}</span><b>${s.label}</b></div>`).join('');
   const includeIcons = svcIcons + `<div><span class="ico">${ICONS.partner}</span><b>Travel Partner</b></div>`;
   const includeCols = activeServices.length + 1;
@@ -816,14 +847,22 @@ function sheetHTML(g, d, idx){
   const twoColItems = [vueloCard, trasladosCard].filter(Boolean);
   const twoColHTML = twoColItems.length ? `<div class="twocol" style="grid-template-columns:${twoColItems.length>1?'1fr 1fr':'1fr'}">${twoColItems.join('')}</div>` : '';
 
-  // Tours card
+  // Tours card — complementary add-on with photo + price per suggested tour, not part of the base package
   let toursCard = '';
-  if(g.services.tours && d.tours && (d.tours.exp1 || d.tours.exp2)){
+  if(g.services.tours && d.tours && d.tours.items && d.tours.items.length){
+    const cols = Math.min(d.tours.items.length, 3);
     toursCard = `
-      <section class="card"><div class="cardtitle iconLabel">${ICONS.tours}EXPERIENCIAS PARA TU VIAJE</div>
-        <div class="experiences">
-          ${d.tours.exp1?`<div class="exp"><b>${d.tours.exp1}</b></div>`:''}
-          ${d.tours.exp2?`<div class="exp"><b>${d.tours.exp2}</b></div>`:''}
+      <section class="card">
+        <div class="cardtitle iconLabel">${ICONS.tours}TOURS Y EXPERIENCIAS <span style="font-weight:600;font-size:11px;color:#6b8580;margin-left:6px;text-transform:none">· complemento a tu paquete, con costo adicional</span></div>
+        ${d.tours.promo?`<div class="chip" style="background:var(--coral);color:#fff;font-weight:800;margin-bottom:14px">${d.tours.promo}</div>`:''}
+        <div class="experiences" style="grid-template-columns:repeat(${cols},1fr)">
+          ${d.tours.items.map(t=>`
+            <div class="exp">
+              ${t.imgData?`<div class="hotelimg" style="height:110px;margin-bottom:10px;--hotelimg:url('${t.imgData}')"></div>`:''}
+              <b>${t.nombre}</b>
+              ${t.precio?`<p style="color:var(--coral);font-weight:800;margin:4px 0 2px">${t.precio}</p>`:''}
+              ${t.desc?`<p>${t.desc}</p>`:''}
+            </div>`).join('')}
         </div>
       </section>`;
   }
@@ -954,7 +993,7 @@ function optionLabel(g, d){
   if(v==='vuelo') return (d.vuelo && d.vuelo.aerolinea) ? 'Vuelo ' + d.vuelo.aerolinea : 'Vuelo';
   if(v==='traslados') return 'Traslados' + (d.traslados && d.traslados.tipo ? ' — '+d.traslados.tipo : '');
   if(v==='seguro') return 'Seguro de viaje';
-  if(v==='tours') return (d.tours && d.tours.exp1) ? d.tours.exp1 : 'Tours';
+  if(v==='tours') return (d.tours && d.tours.items && d.tours.items[0]) ? d.tours.items[0].nombre : 'Tours';
   return 'Propuesta';
 }
 
@@ -967,7 +1006,16 @@ function buildMessage(g, dataList){
     msg += `${i+1}️⃣ *${optionLabel(g,d)}*\n`;
     msg += `   💰 ${money(d.price.total)}${d.price.pp?' ('+money(d.price.pp)+' por persona)':''}\n\n`;
   });
-  msg += `Esta propuesta incluye ${SERVICES.filter(s=>g.services[s.key]).map(s=>s.label.toLowerCase()).join(', ')} y mi acompañamiento antes, durante y después de tu viaje.\n\n`;
+  msg += `Esta propuesta incluye ${SERVICES.filter(s=>g.services[s.key] && s.key!=='tours').map(s=>s.label.toLowerCase()).join(', ')} y mi acompañamiento antes, durante y después de tu viaje.\n\n`;
+  if(g.services.tours && g.varying!=='tours'){
+    const tours = dataList[0] && dataList[0].tours;
+    if(tours && tours.items && tours.items.length){
+      msg += `✨ Además, puedes agregar estos tours a tu paquete (costo adicional):\n`;
+      if(tours.promo) msg += `${tours.promo}\n`;
+      tours.items.forEach(t=>{ msg += `• ${t.nombre}${t.precio?' — '+t.precio:''}\n`; });
+      msg += `\n`;
+    }
+  }
   msg += `Te comparto también el PDF con todos los detalles 📄\n`;
   if(g.linkOnline) msg += `También puedes verla en línea aquí: ${g.linkOnline}\n`;
   msg += `\nCualquier duda aquí estoy. Viajar tranquilo también se planea. ✈️🌊\n`;
