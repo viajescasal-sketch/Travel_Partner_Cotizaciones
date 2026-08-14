@@ -177,7 +177,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--turq);outline-of
   .heroBottom{justify-content:flex-start}
   .payRows{grid-template-columns:1fr}
 }
-@media print{
+@media print{*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important}
   body{background:#fff}
   .topbar,.previewToolbar,.tabs,.msgBox{display:none !important}
   .wrap{padding:0;max-width:none}
