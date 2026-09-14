@@ -165,6 +165,15 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--turq);outline-of
 .msgBox h3{margin:0 0 10px;color:var(--teal);font-size:14px}
 .msgBox textarea{min-height:220px;font-size:13px;line-height:1.5}
 
+
+.partnerIntro .partnerIntroBody{display:grid;grid-template-columns:140px 1fr;gap:22px;align-items:start}
+.partnerPhoto{width:140px;height:140px;border-radius:50%;background:var(--partnerimg,linear-gradient(135deg,#4FA8A0,#1F4E4A)) center/cover;background-color:var(--sand);flex-shrink:0}
+.partnerText h3{margin:0 0 8px;color:var(--teal);font-size:17px}
+.partnerText p{font-size:13px;line-height:1.55;margin:0 0 14px;color:var(--ink)}
+.partnerBenefits{list-style:none;margin:0 0 16px;padding:0}
+.partnerBenefits li{font-size:12.5px;line-height:1.5;margin-bottom:7px;padding-left:22px;position:relative;color:var(--ink)}
+.partnerBenefits li:before{content:'✓';position:absolute;left:0;color:var(--turq);font-weight:800}
+
 @media(max-width:900px){
   .grid,.grid.g2,.grid.g4{grid-template-columns:1fr 1fr}
   .tripgrid{grid-template-columns:1fr 1fr}
@@ -176,6 +185,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--turq);outline-of
   .content{padding:0 20px 24px}
   .heroBottom{justify-content:flex-start}
   .payRows{grid-template-columns:1fr}
+  .partnerIntro .partnerIntroBody{grid-template-columns:1fr;justify-items:center}
+  .partnerIntro .partnerText{text-align:left;max-width:420px}
+  .partnerIntro .partnerText h3{text-align:center}
 }
 @media print{*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important}
   body{background:#fff}
@@ -236,6 +248,14 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--turq);outline-of
           <div class="imgPreview" id="preview_hero_global"></div>
         </div>
         <div class="hint" style="margin-top:6px">Sube una foto del destino (playa, Europa, Oaxaca...). Si no subes nada, se usa un fondo con los colores de la marca.</div>
+      </div>
+      <div class="field">
+        <label>Foto de tu Travel Partner (opcional)</label>
+        <div class="imgUploadRow">
+          <input type="file" accept="image/*" id="g_partnerImgFile" onchange="handleImageUpload(event,'partner_photo')">
+          <div class="imgPreview" id="preview_partner_photo"></div>
+        </div>
+        <div class="hint" style="margin-top:6px">Aparece en la sección "Conoce a tu Travel Partner" al final de la cotización. Si no subes nada, se muestra un marcador con los colores de la marca.</div>
       </div>
     </div>
 
@@ -710,6 +730,7 @@ function collectGlobal(){
     fechaRegreso: val('g_fechaRegreso'),
     fechasTexto: formatDateRange(),
     heroImgData: imageStore['hero_global'] || '',
+    partnerImgData: imageStore['partner_photo'] || '',
     services: {
       vuelo: checkedServices().includes('vuelo'),
       hotel: checkedServices().includes('hotel'),
@@ -789,6 +810,7 @@ function sheetHTML(g, d, idx){
   const heroImg = g.heroImgData || '';
   const hotelImg = (d.hotel && d.hotel.imgData) ? d.hotel.imgData : '';
   const heroStyle = heroImg ? `style="--heroimg:url('${heroImg}')"` : '';
+  const partnerImgStyle = g.partnerImgData ? `style="--partnerimg:url('${g.partnerImgData}')"` : '';
   const hotelStyle = hotelImg ? `style="--hotelimg:url('${hotelImg}')"` : '';
   const partnerDigits = g.partnerTel ? g.partnerTel.replace(/[^0-9]/g,'') : '';
   const waLink = partnerDigits ? `https://wa.me/${partnerDigits}` : '#';
@@ -965,6 +987,24 @@ function sheetHTML(g, d, idx){
           <div><span class="stepn">2</span><p>Verificamos disponibilidad</p></div>
           <div><span class="stepn">3</span><p>Realizas tu anticipo</p></div>
           <div><span class="stepn">4</span><p>Recibes tu confirmación</p></div>
+        </div>
+      </section>
+
+      <section class="card partnerIntro">
+        <div class="cardtitle iconLabel">${ICONS.partner}CONOCE A TU TRAVEL PARTNER</div>
+        <div class="partnerIntroBody">
+          <div class="partnerPhoto" ${partnerImgStyle}></div>
+          <div class="partnerText">
+            <h3>Paulina Salazar</h3>
+            <p>Soy Paulina, tu Travel Partner en Viajes Casal. Te acompaño desde el primer mensaje hasta que regresas a casa, cuidando cada detalle de tu viaje para que tú solo pienses en disfrutarlo.</p>
+            <ul class="partnerBenefits">
+              <li>Atención personalizada, sin presión para decidir.</li>
+              <li>Precios claros y reales, sin sorpresas ni letras chiquitas.</li>
+              <li>Acompañamiento antes, durante y después de tu viaje.</li>
+              <li>Conocimiento directo de destinos y proveedores, para recomendarte lo que de verdad te conviene.</li>
+            </ul>
+            <a class="linkbtn" href="https://paulina.viajescasal.com" target="_blank">${ICONS.web}Conoce más de mí</a>
+          </div>
         </div>
       </section>
 
